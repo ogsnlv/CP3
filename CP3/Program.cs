@@ -4,77 +4,82 @@ namespace CP3
 {
     class Program
     {
-        static int N = 100, M = 100;
-        static double  ax = -10, bx = 10, ay = 0,height =0.5, by = height;
+        static int N = 1000, M = N;
+        static double ax = -10, bx = 10, ay = 0, height = 10, by = height;
         static double hx = (bx - ax) / Convert.ToDouble(N), hy = (by - ay) / Convert.ToDouble(M), epsilon = 0.1, gamma = Math.Pow(hy / hx, 2), Mach = Math.Pow(0.6, 2);
 
         static double[,] Relaxation(double[] x, double[] y)
         {
-            double[,] previous = new double[N, M], temp = new double[N, M];
+            double[,] previous = new double[N, M], psi = new double[N, M], r = new double[N,M];
             bool flag = true;
             int counter = 0;
-            double omega = 1.25;
-            for (int j = 1; j < M ; j++)
-            {
-                temp[0, j] = 0;
-                temp[1, j] = 0;
-                temp[N - 1, j] = 0;
-            }
+            double omega = 0.1;
+            
+             for (int j = 1; j < M ; j++)
+             {
+                psi[0, j] = 0;
+                psi[N - 1, j] = 0;
+             }
 
-            for (int i = 0; i < N-1; i++)
-            {
-                temp[i, 0] = 0;
-                temp[i, M - 1] = -height;
-                if (x[i] >= -1 && x[i] <= 1)
-                {
-                     temp[i, 0] =  -epsilon* (1 - Math.Pow(x[i], 2));
-                }
-            }
-
-            for (int i = 0; i < N; i++)
+             for (int i = 0; i < N-1; i++)
+             {
+                 psi[i, 0] = 0;
+                 psi[i, M - 1] = 0;
+                 if (x[i] >= -1 && x[i] <= 1)
+                    psi[i, 0] =  -epsilon* (1 - Math.Pow(x[i], 2));
+                 
+             }
+             
+             for (int i = 0; i < N; i++)
                 for (int j = 0; j < M; j++)
-                 previous[i, j] = temp[i, j];
-
-                
-
-            while (flag)
-            {
-                int k = 0;
-                for (int i = 1; i < N - 1; i++)
-                    for (int j = 1; j < M - 1; j++)
-                    {
-                        temp[i, j] = 1/(2 * (gamma * (1 - Mach) + 1)) * (gamma * (1 - Mach) * (temp[i - 1, j] + previous[i + 1, j]) + temp[i, j - 1] + previous[i, j + 1]);
-                        temp[i, j] = omega * temp[i, j] + (1 - omega) * previous[i, j];
-                    }
-
-                for (int i = 1; i < N - 1; i++)
-                    for (int j = 1; j < M - 1; j++)
-                        if (Math.Abs(temp[i, j] - previous[i, j]) < (10e-6))
-                            k++;
-                        
-                if (k == (M - 2) * (N - 2))
-                    flag = false;
+                  previous[i, j] = psi[i, j];
+             
 
 
-                for (int i = 1; i < N-1; i++)
-                    for (int j = 1; j < M-1; j++)
-                        previous[i, j] = temp[i, j];
 
-                    
-                counter++;
+             while (flag)
+             {
+                 int k = 0;
+                 for (int i = 1; i < N - 1; i++)
+                     for (int j = 1; j < M - 1; j++)
+                     {
+                        //r[i, j] = (1 - Mach) * gamma * (previous[i + 1, j] - 2 * previous[i, j] + previous[i - 1, j]) + previous[i, j + 1] - 2 * previous[i, j] + previous[i, j - 1];
+                        psi[i, j] = 1/(2 * (gamma * (1 - Mach) + 1)) * (gamma * (1 - Mach) * (previous[i - 1, j] + previous[i + 1, j]) + previous[i, j - 1] + previous[i, j + 1]);
+                        //psi[i, j] = omega*psi[i, j] +  (1-omega)*previous[i,j];
+                        //psi[i, j] = previous[i, j] + omega * r[i, j];
+                     }
+
+                 for (int i = 1; i < N - 1; i++)
+                     for (int j = 1; j < M - 1; j++)
+                         if (Math.Abs(psi[i, j] - previous[i, j]) < (10e-6))
+                             k++;
+
+                 if (k == (M - 2) * (N - 2))
+                     flag = false;
+
+
+                 for (int i = 1; i < N-1; i++)
+                     for (int j = 1; j < M-1; j++)
+                         previous[i, j] = psi[i, j];
+
+
+                 counter++;
+                Console.WriteLine("{0};{1}", counter, 2 * (1 / (1 - Mach) * (psi[N / 2, 2] - psi[N / 2, 0]) / (2 * hy)));
             }
 
-            for(int i = 0; i < N; i++)
-            {
-                //for (int j = 1; j < M-1; j++)
-                    //Console.WriteLine("{0}; {1}; {2}", x[i], -2*(1 / (1 - Mach) * (temp[i, j+1] - temp[i, j-1]) / (2*hy)), y[j]) ;
-                    Console.WriteLine("{0}; {1}", x[i], -2 * (1 / (1 - Mach) * (temp[i, 2] - temp[i, 0]) / (2 * hy)));
-                //Console.WriteLine("{0}; {1}; {2}", x[i],temp[i, j], y[j]);
+          
+           
 
-            }
-            return temp;
+            //for (int i = 0; i < N; i++)
+                //if (x[i] >= -1.5 && x[i] <= 1.5)
+                    //Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
+              
+
+            
+
+            return psi;
         }
-
+        /*
         static double[,] SIP(double[] x, double[] y)
         {
             double[,] psi = new double[N, M], previous= new double[N, M], B = new double[N, M], C = new double[N, M], D = new double[N, M], E = new double[N, M], F = new double[N, M], G = new double[N, M], H = new double[N, M], V = new double[N, M], R = new double[N, M],
@@ -96,7 +101,7 @@ namespace CP3
                   {
                       psi[i, 0] = -epsilon * (1 - Math.Pow(x[i], 2));
                   }
-              }*/
+              }
             for (int i = 0; i < N; i++)
                 for (int j = 1; j < M; j++)
                 {
@@ -221,7 +226,7 @@ namespace CP3
                     for (int j = 1; j < M - 1; j++)
                     {
                         R[i, j] = q[i, j] - (B[i, j] * previous[i, j - 1] + D[i, j] * previous[i - 1, j] + E[i, j] * previous[i, j] + F[i, j] * previous[i + 1, j] + H[i, j] * previous[i, j + 1]);
-                        
+                        Console.WriteLine(R[i, j]);
                     }
                 for (int i = 1; i < N; i++)
                     for (int j = 1; j < M; j++)
@@ -244,19 +249,20 @@ namespace CP3
                     for (int j = 0; j < M; j++)
                     {
                         psi[i, j] = previous[i, j] + delta[i, j];
-                       
-                         Console.WriteLine(psi[i,j]);
+                        Console.WriteLine(delta[i, j]);
+
                     }
                 for (int i = 1; i < N - 1; i++)
                     for (int j = 1; j < M - 1; j++)
                         if (Math.Abs(psi[i, j] - previous[i, j]) < (10e-3))
                             k++;
 
-                if (k == (M - 2) * (N - 2) || counter == 100000)
+                if (k == (M - 2) * (N - 2) )
                     flag = false;
 
                
                 counter++;
+                Console.WriteLine(counter);
                 for (int i = 1; i < N - 1; i++)
                     for (int j = 1; j < M - 1; j++)
                         previous[i, j] = psi[i, j];
@@ -274,7 +280,109 @@ namespace CP3
             }
                     return psi;
         }
+*/
 
+        static double[,] SIP(double[] x, double[] y) {
+            double[,] previous = new double[N, M], psi = new double[N, M];
+            bool flag = true;
+            int counter = 0;
+            double k = 0;
+            double[] A = new double[M], B = new double[M], C = new double[M], F = new double[M], alpha = new double[M], beta = new double[M];
+            for (int i = 0; i < N; i++)
+            {
+                for (int j = 0; j < M; j++)
+                {
+                    psi[i, j] = 0;
+                    previous[i, j] = 0;
+                }
+            }
+
+
+
+
+            while (flag)
+            {
+                k = 0;
+                for (int i = 1; i < N - 1; i++)
+                {
+
+                    A[0] = 0;
+                    B[0] = 1;
+                    F[0] = 0;
+                    if (x[i] >= -1 && x[i] <= 1)
+                        F[0] = -epsilon * (1 - Math.Pow(x[i], 2));
+
+                    B[M - 1] = 1;
+                    C[M - 1] = 0;
+                    F[M - 1] = 0;
+
+                    alpha[1] = -C[0] / B[0];
+                    beta[1] = F[0] / B[0];
+
+                    for (int j = 1; j < M - 1; j++)
+                    {
+                        A[j] = 1;
+                        B[j] = -2 * (gamma * (1 - Mach) + 1);
+                        C[j] = 1;
+                        F[j] = -gamma * (1 - Mach) * (previous[i + 1, j] + psi[i - 1, j]);
+
+                        alpha[j + 1] = -C[j] / (A[j] * alpha[j] + B[j]);
+                        beta[j + 1] = (F[j] - A[j] * beta[j]) / (A[j] * alpha[j] + B[j]);
+
+                    }
+
+                    psi[i, M - 1] = (F[M - 1] - A[M - 1] * beta[M - 1]) / (B[M - 1] + A[M - 1] * alpha[M - 1]);
+
+                    for (int j = M - 2; j >= 0; j--)
+                    {
+                        psi[i, j] = alpha[j + 1] * psi[i, j + 1] + beta[j + 1];
+
+                     
+                    }
+
+                }
+                for (int i = 0; i < N; i++)
+                    for (int j = 0; j < M; j++)
+                    {
+
+
+                        if (Math.Abs(psi[i, j] - previous[i, j]) < (10e-5))
+                            k++;
+                    }
+                if (k == M * N)
+                    flag = false;
+
+
+                for (int i = 0; i < N; i++)
+                    for (int j = 0; j < M; j++)
+                        previous[i, j] = psi[i, j];
+
+                
+                counter++;
+
+                Console.WriteLine("{0};{1}", counter, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
+            }
+           // double[] CP = new double[N];
+          //  double max = 0;
+
+            //for (int i = 0; i < N; i++)
+            {
+              //  CP[i] = 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy));
+               // Console.WriteLine(CP[i]);
+            }
+          //  max = CP[0];
+            //for (int i = 1; i < N; i++)
+                //if (CP[i] > max)
+                  //  max = CP[i];
+           
+                //if (x[i] >= -1.5 && x[i] <= 1.5)
+                //Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
+
+
+
+
+                return psi;
+        }
         static void Main(string[] args)
         {
             double[] x = new double[N], y = new double[M];
@@ -290,8 +398,8 @@ namespace CP3
                 y[j + 1] = y[j] + hy;
             }
 
-            //Relaxation(x, y);
-            SIP(x, y);
+            Relaxation(x, y);
+            //SIP(x, y);
            
             
 
