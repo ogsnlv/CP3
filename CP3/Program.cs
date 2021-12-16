@@ -4,7 +4,7 @@ namespace CP3
 {
     class Program
     {
-        //static int N = 700, M = N;
+        //static int N = 700, M =
         static double ax = -10, bx = 10, ay = 0, height =0.5, by = height;
         static double  epsilon = 0.1, Mach = Math.Pow(0.6, 2);
 
@@ -64,12 +64,12 @@ namespace CP3
                          previous[i, j] = psi[i, j];
                 counter++;
 
-                Console.WriteLine("{0};{1}", counter, 2 * (1 / (1 - Mach) * (psi[N / 2, 2] - psi[N / 2, 0]) / (2 * hy)));
+               // Console.WriteLine("{0};{1}", counter, 2 * (1 / (1 - Mach) * (psi[N / 2, 2] - psi[N / 2, 0]) / (2 * hy)));
             }
             //Console.WriteLine("{0}; {1}", N, 2 * (1 / (1 - Mach) * (psi[N / 2, 2] - psi[N / 2, 0]) / (2 * hy)));
-            //Console.WriteLine("{0}; {1}", N, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
+            Console.WriteLine("{0}; {1}", N, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
              //for (int i = 0; i < N; i++)
-             // Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
+              Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
             return psi;
         }
        
@@ -153,9 +153,9 @@ namespace CP3
                 //Console.WriteLine("{0};{1}", counter, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
             }
 
-            Console.WriteLine("{0}; {1}", hx, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
-           // for(int i=0;i<N;i++)
-            //Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
+           // Console.WriteLine("{0}; {1}", hx, 2 * (1 / (1 - Mach) * (psi[N/2, 2] - psi[N/2, 0]) / (2 * hy)));
+           for(int i=0;i<N;i++)
+            Console.WriteLine("{0}; {1}", x[i], 2 * (1 / (1 - Mach) * (psi[i, 2] - psi[i, 0]) / (2 * hy)));
 
             return psi;
         }
@@ -182,7 +182,7 @@ namespace CP3
                 //Relaxation(x, y, N, M, hx, hy);
                 SIP(x, y, N, M, hx, hy);
             }
-            //
+            
 
         }
 
